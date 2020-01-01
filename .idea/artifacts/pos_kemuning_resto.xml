@@ -1,0 +1,27 @@
+<component name="ArtifactManager">
+  <artifact type="javafx" name="pos_kemuning_resto">
+    <output-path>$PROJECT_DIR$/out/artifacts/pos_kemuning_resto</output-path>
+    <properties id="javafx-properties">
+      <options>
+        <option name="appClass" value="scene.main.Main" />
+        <option name="description" value="" />
+        <option name="htmlPlaceholderId" value="" />
+        <option name="nativeBundle" value="all" />
+        <option name="title" value="POS" />
+        <option name="vendor" value="" />
+        <option name="version" value="1.4" />
+      </options>
+    </properties>
+    <root id="root">
+      <element id="archive" name="pos_kemuning_resto.jar">
+        <element id="module-output" name="pos_kemuning_resto" />
+      </element>
+      <element id="library" level="project" name="mysql-connector-java-5.1.40-bin" />
+      <element id="library" level="project" name="commons-dbcp2-2.1.1-javadoc" />
+      <element id="library" level="project" name="commons-io-2.5-javadoc" />
+      <element id="library" level="project" name="json-20160810-javadoc" />
+      <element id="library" level="project" name="json-simple-1.1.1" />
+      <element id="library" level="project" name="commons-logging-1.2-javadoc" />
+    </root>
+  </artifact>
+</component>

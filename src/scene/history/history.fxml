@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<?import javafx.stage.Screen?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+<GridPane maxHeight="Infinity" maxWidth="Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="${screen.visualBounds.width}" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="scene.history.history_controller">
+    <fx:define>
+        <Screen fx:factory="getPrimary" fx:id="screen"/>
+    </fx:define>
+    <columnConstraints>
+      <ColumnConstraints hgrow="NEVER" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" />
+      <ColumnConstraints hgrow="ALWAYS" minWidth="30.0" prefWidth="500" />
+      <ColumnConstraints hgrow="NEVER" maxWidth="30.0" minWidth="30.0" prefWidth="100.0" />
+      <ColumnConstraints hgrow="ALWAYS" minWidth="30.0" prefWidth="1200.0" />
+      <ColumnConstraints hgrow="NEVER" maxWidth="30.0" minWidth="30.0" prefWidth="100.0" />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+      <RowConstraints minHeight="170.0" prefHeight="300.0" vgrow="ALWAYS" />
+      <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+      <RowConstraints minHeight="30.0" prefHeight="650.0" vgrow="ALWAYS" />
+      <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+   </rowConstraints>
+   <children>
+      <ListView fx:id="history_listview" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="3" />
+      <TableView fx:id="history_tableview" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="3">
+        <columns>
+          <TableColumn fx:id="history_tableview_no" prefWidth="75.0" text="No" />
+          <TableColumn fx:id="history_tableview_name" prefWidth="625.0" text="Name" />
+          <TableColumn fx:id="history_tableview_price" prefWidth="250.0" text="Price" />
+          <TableColumn fx:id="history_tableview_quantity" prefWidth="75.0" text="Quantity" />
+          <TableColumn fx:id="history_tableview_subtotal" prefWidth="250.0" text="Sub Total" />
+        </columns>
+      </TableView>
+      <GridPane GridPane.columnIndex="3" GridPane.rowIndex="1">
+        <columnConstraints>
+          <ColumnConstraints hgrow="NEVER" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="NEVER" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="NEVER" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="NEVER" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+          <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+        </rowConstraints>
+          <children>
+              <Label text="Customer Code" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+              <Label text="Total" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+              <Label text="Discount" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+              <Label text="Grand Total" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+              <Label text=":" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+              <Label text=":" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+              <Label text=":" GridPane.columnIndex="2" GridPane.rowIndex="3"/>
+              <Label text=":" GridPane.columnIndex="2" GridPane.rowIndex="4"/>
+              <Label fx:id="history_label_customercodevalue" text="" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+              <Label fx:id="history_label_totalvalue" text="" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
+              <Label fx:id="history_label_discountvalue" text="" GridPane.columnIndex="3" GridPane.rowIndex="3"/>
+              <Label fx:id="history_label_grandtotalvalue" text="" GridPane.columnIndex="3" GridPane.rowIndex="4"/>
+              <Button fx:id="history_button_print" onAction="#button_print" text="Print" GridPane.columnIndex="5" GridPane.rowIndex="4"/>
+          </children>
+      </GridPane>
+   </children>
+</GridPane>

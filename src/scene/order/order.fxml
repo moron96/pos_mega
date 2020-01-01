@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<?import javafx.stage.Screen?>
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="${screen.visualBounds.width}" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="scene.order.order_controller">
+    <fx:define>
+        <Screen fx:factory="getPrimary" fx:id="screen"/>
+    </fx:define>
+    <columnConstraints>
+    <ColumnConstraints hgrow="NEVER" maxWidth="45" minWidth="45.0" prefWidth="45.0" />
+    <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="600.0" />
+    <ColumnConstraints hgrow="NEVER" maxWidth="15" minWidth="15.0" prefWidth="15.0" />
+    <ColumnConstraints hgrow="NEVER" maxWidth="35" minWidth="35.0" prefWidth="35.0" />
+    <ColumnConstraints hgrow="NEVER" maxWidth="15" minWidth="15.0" prefWidth="15.0" />
+    <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="1200.0" />
+    <ColumnConstraints hgrow="NEVER" maxWidth="45" minWidth="45.0" prefWidth="45.0" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints maxHeight="30" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+    <RowConstraints maxHeight="60" minHeight="60.0" prefHeight="60.0" vgrow="NEVER" />
+    <RowConstraints maxHeight="15" minHeight="15.0" prefHeight="15.0" vgrow="NEVER" />
+    <RowConstraints maxHeight="30" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+    <RowConstraints maxHeight="15" minHeight="15.0" prefHeight="15.0" vgrow="NEVER" />
+    <RowConstraints maxHeight="30" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+    <RowConstraints minHeight="10.0" prefHeight="400.0" vgrow="ALWAYS" />
+    <RowConstraints maxHeight="30" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+    <RowConstraints minHeight="150.0" prefHeight="150.0" vgrow="ALWAYS" />
+    <RowConstraints maxHeight="30" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+  </rowConstraints>
+   <children>
+      <ListView fx:id="order_listview" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="6" />
+      <GridPane GridPane.columnIndex="1" GridPane.rowIndex="8">
+        <columnConstraints>
+          <ColumnConstraints hgrow="NEVER" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" />
+          <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="NEVER" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" />
+          <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="NEVER" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+          <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+        </rowConstraints>
+          <children>
+              <Label text="Customer Code" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+              <Label text="Discount" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+              <Label text=":" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+              <Label text=":" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+              <TextField fx:id="order_textfield_customer_code" text="" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+              <TextField fx:id="order_textfield_discount" text="" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+              <Button fx:id="order_button_list_apply" onAction="#button_list_apply" text="Apply" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+          </children>
+      </GridPane>
+      <GridPane GridPane.columnIndex="5" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.rowSpan="7" GridPane.valignment="TOP">
+        <columnConstraints>
+          <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="ALWAYS" />
+          <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+          <RowConstraints maxHeight="200.0" minHeight="10.0" prefHeight="30.0" vgrow="ALWAYS" />
+        </rowConstraints>
+          <children>
+              <TableView fx:id="order_tableview" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                  <columns>
+                      <TableColumn fx:id="order_tableview_no" prefWidth="75.0" text="No" />
+                      <TableColumn fx:id="order_tableview_name" prefWidth="625.0" text="Name" />
+                      <TableColumn fx:id="order_tableview_price" prefWidth="211.0" text="Price" />
+                      <TableColumn fx:id="order_tableview_quantity" prefWidth="75.0" text="Quantity" />
+                      <TableColumn fx:id="order_tableview_subtotal" prefWidth="211.0" text="Sub Total" />
+                  </columns>
+              </TableView>
+              <GridPane GridPane.columnIndex="0" GridPane.rowIndex="2">
+                  <columnConstraints>
+                      <ColumnConstraints hgrow="NEVER" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" />
+                      <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                      <ColumnConstraints hgrow="NEVER" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" />
+                      <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                      <ColumnConstraints hgrow="NEVER" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" />
+                  </columnConstraints>
+                  <rowConstraints>
+                      <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+                      <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+                      <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+                      <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+                      <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+                      <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+                      <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+                  </rowConstraints>
+                  <children>
+                      <Label text="Total" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                      <Label text="Discount" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                      <Label text="Grand Total" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                      <Label text=":" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                      <Label text=":" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                      <Label text=":" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                      <Label fx:id="order_label_totalvalue" text="0.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                      <Label fx:id="order_label_discountvalue" text="0.0" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                      <Label fx:id="order_label_grandtotalvalue" text="0.0" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                      <Button fx:id="order_button_menu_bayar" onAction="#button_menu_bayar" text="Bayar" GridPane.columnIndex="3" GridPane.rowIndex="5" />
+                  </children>
+              </GridPane>
+          </children>
+      </GridPane>
+      <Button fx:id="order_button_listplus" maxHeight="35.0" maxWidth="35.0" minHeight="35.0" minWidth="35.0" mnemonicParsing="false" onAction="#button_listplus" text="+" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+      <Button fx:id="order_button_listminus" maxHeight="35.0" maxWidth="35.0" minHeight="35.0" minWidth="35.0" mnemonicParsing="false" onAction="#button_listminus" text="-" GridPane.columnIndex="3" GridPane.rowIndex="5" />
+      <HBox alignment="CENTER_RIGHT" GridPane.columnIndex="5" GridPane.rowIndex="1">
+        <children>
+          <Button fx:id="order_button_menuadd" maxHeight="35.0" maxWidth="100.0" minHeight="35.0" minWidth="100.0" mnemonicParsing="false" onAction="#button_menuadd" text="Add">
+               <HBox.margin>
+                  <Insets left="10.0" top="15.0" />
+               </HBox.margin></Button>
+          <Button fx:id="order_button_menuplus" maxHeight="35.0" maxWidth="35.0" minHeight="35.0" minWidth="35.0" mnemonicParsing="false" onAction="#button_menuplus" text="+">
+               <HBox.margin>
+                  <Insets left="10.0" top="15.0" />
+               </HBox.margin></Button>
+          <Button fx:id="order_button_menuminus" maxHeight="35.0" maxWidth="35.0" minHeight="35.0" minWidth="35.0" mnemonicParsing="false" onAction="#button_menuminus" text="-">
+               <HBox.margin>
+                  <Insets left="5.0" top="15.0" />
+               </HBox.margin></Button>
+          <Button fx:id="order_button_menuremove" maxHeight="35.0" maxWidth="100.0" minHeight="35.0" minWidth="100.0" mnemonicParsing="false" onAction="#button_menuremove" text="Remove">
+               <HBox.margin>
+                  <Insets left="10.0" top="15.0" />
+               </HBox.margin></Button>
+        </children>
+      </HBox>
+   </children>
+</GridPane>

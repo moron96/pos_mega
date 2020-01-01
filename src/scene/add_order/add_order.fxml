@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="420.0" prefWidth="600.0" style=" -fx-border-color:black; -fx-border-width: 1; -fx-border-style: solid;" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="scene.add_order.add_order_controller">
+    <columnConstraints>
+        <ColumnConstraints halignment="CENTER" minWidth="10.0" prefWidth="60.0" />
+        <ColumnConstraints minWidth="10.0" prefWidth="225.0" />
+        <ColumnConstraints halignment="CENTER" minWidth="10.0" prefWidth="30.0" />
+        <ColumnConstraints minWidth="10.0" prefWidth="225.0" />
+        <ColumnConstraints halignment="CENTER" minWidth="10.0" prefWidth="60.0" />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints minHeight="10.0" prefHeight="20.0" />
+        <RowConstraints minHeight="10.0" prefHeight="50.0" />
+        <RowConstraints minHeight="10.0" prefHeight="40.0" />
+        <RowConstraints minHeight="10.0" prefHeight="60.0" />
+        <RowConstraints minHeight="10.0" prefHeight="100.0" />
+        <RowConstraints minHeight="10.0" prefHeight="60.0" />
+        <!--<RowConstraints minHeight="10.0" prefHeight="40.0" />
+        <RowConstraints minHeight="10.0" prefHeight="40.0" />
+        <RowConstraints minHeight="10.0" prefHeight="50.0" />-->
+        <RowConstraints minHeight="10.0" prefHeight="30.0" />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" />
+    </rowConstraints>
+    <children>
+        <Label fx:id="labelAddOrder" layoutX="222.0" layoutY="60.0" text="Add Order" GridPane.columnIndex="0" GridPane.columnSpan="5" GridPane.rowIndex="1">
+            <font>
+                <Font size="27.0" />
+            </font></Label>
+        <Label text="Customer Code" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+        <Label text="Notes" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+        <Label fx:id="labelWarning" text="" GridPane.columnIndex="0" GridPane.rowIndex="5" GridPane.columnSpan="5" textFill="#f52525"/>
+        <TextField onKeyPressed="#handleKeyPressed" fx:id="textFieldCustomerCode" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+        <TextArea onKeyPressed="#handleKeyPressed" fx:id="textAreaNotes" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+        <Button onKeyPressed="#handleKeyPressed" fx:id="buttonOK" mnemonicParsing="false" onAction="#buttonOKAction" text="OK" GridPane.columnIndex="0" GridPane.columnSpan="5" GridPane.rowIndex="7" />
+    </children>
+</GridPane>
