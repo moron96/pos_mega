@@ -17,11 +17,9 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Locale;
+import java.util.*;
 
 import static java.lang.Math.round;
 
@@ -57,6 +55,14 @@ public class pdf_generator {
             float width = pdPage.getMediaBox().getWidth();
             float currheight = height;
             PDPageContentStream contentStream = new PDPageContentStream(pdDocument, pdPage);
+
+            String[][] content = {{"a","b", "1"},
+                    {"c","d", "2"},
+                    {"e","f", "3"},
+                    {"g","h", "4"},
+                    {"i","j", "5"}} ;
+
+            drawTable(pdPage, contentStream, 700, 100, content);
 
             contentStream.beginText();
             contentStream.newLineAtOffset(30, height-50);
@@ -235,9 +241,9 @@ public class pdf_generator {
             contentStream.close();
             pdDocument.addPage(pdPage);
             pdDocument.save("D:\\"+ sdf.format(currdate) +".pdf");
-            pdDocument.save("E:\\"+ sdf.format(currdate) +".pdf");
-            pdDocument.save("F:\\"+ sdf.format(currdate) +".pdf");
-            pdDocument.save("G:\\"+ sdf.format(currdate) +".pdf");
+//            pdDocument.save("E:\\"+ sdf.format(currdate) +".pdf");
+//            pdDocument.save("F:\\"+ sdf.format(currdate) +".pdf");
+//            pdDocument.save("G:\\"+ sdf.format(currdate) +".pdf");
             pdDocument.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -269,4 +275,114 @@ public class pdf_generator {
 
     }
 
+    public void drawTable(PDPage page, PDPageContentStream contentStream,
+                                 float y, float margin,
+                                 String[][] content) throws IOException {
+        int rows = 40;
+        int cols = 3;
+        final float rowHeight = 20f;
+        final float tableWidth = page.getMediaBox().getWidth()-(2*margin);
+        final float tableHeight = rowHeight * rows;
+        final float colWidth = tableWidth/(float)cols;
+        final float cellMargin=5f;
+
+        //draw the rows
+        float nexty = y ;
+        for (int i = 0; i <= rows; i++) {
+            contentStream.drawLine(margin,nexty,margin+tableWidth,nexty);
+            nexty-= rowHeight;
+        }
+
+        //draw the columns
+        float nextx = margin;
+        for (int i = 0; i <= cols; i++) {
+            contentStream.drawLine(nextx,y,nextx,y-tableHeight);
+            nextx += colWidth;
+        }
+
+        //now add the text
+        contentStream.setFont(PDType1Font.HELVETICA_BOLD,12);
+
+        float textx = margin+cellMargin;
+        float texty = y-15;
+
+        String head = "Ctegory";
+        contentStream.beginText();
+        contentStream.moveTextPositionByAmount(textx,texty);
+        contentStream.drawString(head);
+        contentStream.endText();
+        textx += colWidth;
+
+        head = "Menu";
+        contentStream.beginText();
+        contentStream.moveTextPositionByAmount(textx,texty);
+        contentStream.drawString(head);
+        contentStream.endText();
+        textx += colWidth;
+
+        head = "Quantity";
+        contentStream.beginText();
+        contentStream.moveTextPositionByAmount(textx,texty);
+        contentStream.drawString(head);
+        contentStream.endText();
+
+        texty-=rowHeight;
+        textx = margin+cellMargin;
+        rows++;
+
+//        float textx = margin+cellMargin;
+//        float texty = y-15;
+//        for(int i = 0; i < content.length; i++){
+//            for(int j = 0 ; j < content[i].length; j++){
+//                String text = content[i][j];
+//                contentStream.beginText();
+//                contentStream.moveTextPositionByAmount(textx,texty);
+//                contentStream.drawString(text);
+//                contentStream.endText();
+//                textx += colWidth;
+//            }
+//            texty-=rowHeight;
+//            textx = margin+cellMargin;
+//        }
+
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+        String dateInString = "07-07-2019";
+        Date date = new Date();
+        try {
+            date = formatter.parse(dateInString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        for (Map<String,String> map: orderDetailDatabaseUtils.monthlyOrderDetailRecapMenu(date)) {
+            rows++;
+            cols = map.size();
+
+            String text = map.get("category_name");
+            contentStream.beginText();
+            contentStream.moveTextPositionByAmount(textx,texty);
+            contentStream.drawString(text);
+            contentStream.endText();
+            textx += colWidth;
+            System.out.println(text);
+
+            text = map.get("menu_name");
+            contentStream.beginText();
+            contentStream.moveTextPositionByAmount(textx,texty);
+            contentStream.drawString(text);
+            contentStream.endText();
+            textx += colWidth;
+            System.out.println(text);
+
+            text = map.get("qty");
+            contentStream.beginText();
+            contentStream.moveTextPositionByAmount(textx,texty);
+            contentStream.drawString(text);
+            contentStream.endText();
+            System.out.println(text);
+
+            texty-=rowHeight;
+            textx = margin+cellMargin;
+        }
+    }
 }

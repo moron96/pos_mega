@@ -6,7 +6,8 @@ import model.Order_Detail;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -239,4 +240,84 @@ public class OrderDetailDatabaseUtils {
         }
     }
 
+    public ArrayList<Map<String, String>> monthlyOrderDetailRecapMenu(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.UK);
+        ResultSet result;
+        String sql = "SELECT m.*, sum(od."+ COLUMN_ORDER_DETAILS_QTY +") as "+ COLUMN_ORDER_DETAILS_QTY +", o."+ COLUMN_ORDERS_DATE +", o."+ COLUMN_ORDERS_CUSTOMER_CODE +
+                " from "+ TABLE_ORDER_DETAILS +" od" +
+                " left join "+ TABLE_ORDERS +" o on od."+ COLUMN_ORDER_DETAILS_ORDER_ID +" = o."+ COLUMN_ORDERS_ID +
+                " left join (" +
+                    " select m."+ COLUMN_MENUS_ID +" as menu_id, m."+ COLUMN_MENUS_NAME +" as menu_name, c."+ COLUMN_CATEGORIES_NAME +" as category_name from "+ TABLE_MENUS +" m" +
+                    " left join "+ TABLE_CATEGORIES +" c on m."+ COLUMN_MENUS_CATEGORY_ID +" = c." + COLUMN_CATEGORIES_ID +
+                " ) m on m.menu_id = od." + COLUMN_ORDER_DETAILS_MENU_ID +
+                " where "+ COLUMN_ORDERS_DATE +" <= last_day('"+ sdf.format(date) +"') and "+ COLUMN_ORDERS_DATE +" >= date_add(date_add(LAST_DAY('"+ sdf.format(date) +"'),interval 1 DAY),interval -1 MONTH)" +
+                " group by menu_id" +
+                " order by "+ COLUMN_ORDER_DETAILS_QTY +" desc;";
+
+        System.out.println(sql);
+        ArrayList<Map<String, String>> maplist = new ArrayList<>();
+        try {
+            databaseHelper.open();
+            result = databaseHelper.doQuery(sql);
+
+            //insert data to ArrayList
+            while(result.next()) {
+                Map<String, String> map = new HashMap<>();
+
+                map.put("category_name",result.getString("category_name"));
+                map.put("menu_name",result.getString("menu_name"));
+                map.put("qty",result.getString(COLUMN_ORDER_DETAILS_QTY));
+
+                maplist.add(map);
+            }
+
+            result.close();
+            databaseHelper.close();
+            return maplist;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Logger.getLogger("Log SQL").log(Level.SEVERE, "Get Monthly Order Detail Recap Query failed!", e);
+            return null;
+        }
+    }
+
+    public ArrayList<Map<String, String>> monthlyOrderDetailRecapCategory(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.UK);
+        ResultSet result;
+        String sql = "SELECT m.*,sum(od."+ COLUMN_ORDER_DETAILS_QTY +") as "+ COLUMN_ORDER_DETAILS_QTY +",o."+ COLUMN_ORDERS_DATE +",o."+ COLUMN_ORDERS_CUSTOMER_CODE +
+                " from "+ TABLE_ORDER_DETAILS +" od" +
+                " left join "+ TABLE_ORDERS +" o on od."+ COLUMN_ORDER_DETAILS_ORDER_ID +" = o."+ COLUMN_ORDERS_ID +
+                " left join (" +
+                " select m."+ COLUMN_MENUS_ID +" as menu_id, m."+ COLUMN_MENUS_NAME +" as menu_name, c."+ COLUMN_CATEGORIES_NAME +" as category_name from "+ TABLE_MENUS +" m" +
+                " left join "+ TABLE_CATEGORIES +" c on m."+ COLUMN_MENUS_CATEGORY_ID +" = c." + COLUMN_CATEGORIES_ID +
+                " ) m on m."+ COLUMN_MENUS_ID +" = od." + COLUMN_ORDER_DETAILS_MENU_ID +
+                " where "+ COLUMN_ORDERS_DATE +" <= last_day("+ sdf.format(date) +") and "+ COLUMN_ORDERS_DATE +" >= date_add(date_add(LAST_DAY("+ sdf.format(date) +"),interval 1 DAY),interval -1 MONTH)" +
+                " group by category_name" +
+                "order by "+ COLUMN_ORDER_DETAILS_QTY +" desc;";
+
+        System.out.println(sql);
+        ArrayList<Map<String, String>> maplist = new ArrayList<>();
+        try {
+            databaseHelper.open();
+            result = databaseHelper.doQuery(sql);
+
+            //insert data to ArrayList
+            while(result.next()) {
+                Map<String, String> map = new HashMap<String, String>();
+
+                map.put("category_name",result.getString("category_name"));
+                map.put("qty",result.getString(COLUMN_ORDER_DETAILS_QTY));
+
+                maplist.add(map);
+            }
+
+            result.close();
+            databaseHelper.close();
+            return maplist;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Logger.getLogger("Log SQL").log(Level.SEVERE, "Get Monthly Order Detail Recap Query failed!", e);
+            return null;
+        }
+    }
 }

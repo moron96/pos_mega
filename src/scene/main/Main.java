@@ -42,6 +42,8 @@ public class Main extends Application {
 //        PrintDailyReport printDailyReport = new PrintDailyReport();
 //        printDailyReport.doPrintDaily();
 
+        pdf_generator pdf_generator = new pdf_generator();
+
         Parent root = FXMLLoader.load(getClass().getResource("main.fxml"));
         primaryStage.setTitle("test");
         primaryStage.setScene(new Scene(root, 800, 600));
