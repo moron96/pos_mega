@@ -35,208 +35,105 @@ public class pdf_generator {
     private OrderDetailDatabaseUtils orderDetailDatabaseUtils = new OrderDetailDatabaseUtils(dbHelper);
     private MenuDatabaseUtils menuDatabaseUtils = new MenuDatabaseUtils(dbHelper);
 
-    public pdf_generator() {
+    private PDDocument pdDocument;
+    private PDPage pdPage;
+    private PDPageContentStream contentStream;
 
+    public boolean generateReport(Date date) {
         try {
-            PDDocument pdDocument = new PDDocument();
+            pdDocument = new PDDocument();
             PDDocumentInformation pdDocumentInformation = pdDocument.getDocumentInformation();
             pdDocumentInformation.setAuthor("Monacode");
             pdDocumentInformation.setTitle("Recap");
             pdDocumentInformation.setCreator("POS Kemuning");
-            Calendar date = new GregorianCalendar();
+            Calendar now = new GregorianCalendar();
+
             Date currdate = new Date();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.UK);
-            date.set(currdate.getYear(),currdate.getMonth(),currdate.getDate());
-            pdDocumentInformation.setCreationDate(date);
+            now.set(currdate.getYear(),currdate.getMonth(),currdate.getDate());
+            pdDocumentInformation.setCreationDate(now);
 
-
-            PDPage pdPage = new PDPage(PDRectangle.A4);
+            pdPage = new PDPage(PDRectangle.A4);
             float height = pdPage.getMediaBox().getHeight();
             float width = pdPage.getMediaBox().getWidth();
-            float currheight = height;
-            PDPageContentStream contentStream = new PDPageContentStream(pdDocument, pdPage);
+            float currheight = height-30;
+            contentStream = new PDPageContentStream(pdDocument, pdPage);
 
-            String[][] content = {{"a","b", "1"},
-                    {"c","d", "2"},
-                    {"e","f", "3"},
-                    {"g","h", "4"},
-                    {"i","j", "5"}} ;
-
-            drawTable(pdPage, contentStream, 700, 100, content);
-
-            contentStream.beginText();
-            contentStream.newLineAtOffset(30, height-50);
-            contentStream.setFont(PDType1Font.TIMES_BOLD,30);
-            contentStream.showText("KEMUNING RESTO");
             contentStream.setLeading(20.5f);
-            contentStream.newLine();
-            contentStream.setFont(PDType1Font.TIMES_BOLD,20);
-            contentStream.showText("Daily Report");
-            contentStream.endText();
 
-            currheight =height-(50+30+15);
             contentStream.beginText();
             contentStream.newLineAtOffset(30, currheight);
-            contentStream.setFont(PDType1Font.TIMES_ROMAN,14);
+            contentStream.setFont(PDType1Font.TIMES_BOLD,20);
+            currheight -= 20;
+            contentStream.showText("KEMUNING RESTO");
+
+            contentStream.newLine();
+            contentStream.setFont(PDType1Font.TIMES_BOLD,15);
+            currheight -= 15;
+            contentStream.showText("Daily Report");
+
+            contentStream.newLine();
+            contentStream.setFont(PDType1Font.TIMES_ROMAN,12);
+            currheight -= 12;
             contentStream.showText("Date : "+sdf.format(currdate));
             contentStream.endText();
 
-            currheight -=10;
-            contentStream.drawLine(30,currheight,width-60,currheight);
+            currheight -=5;
+            contentStream.drawLine(30,currheight,width-30,currheight);
+            currheight -=20;
 
             contentStream.beginText();
-            currheight -=30;
-            contentStream.newLineAtOffset(50, currheight);
-            contentStream.setFont(PDType1Font.TIMES_BOLD,16);
-            contentStream.showText("Item Name");
+            contentStream.newLineAtOffset(30, currheight);
+            contentStream.setFont(PDType1Font.TIMES_BOLD,15);
+            currheight -= 5;
+            contentStream.showText("MONTHLY MENU QUANTITIES SOLD");
             contentStream.endText();
+
+            ArrayList<Float> widths = new ArrayList<>();
+            widths.add(0.25f);
+            widths.add(0.6f);
+            widths.add(0.15f);
+
+            currheight = drawTable(currheight, 50, widths,
+                    orderDetailDatabaseUtils.monthlyOrderDetailRecapMenu(date));
+
+
+            currheight -=20;
+            contentStream.drawLine(30,currheight,width-30,currheight);
+            currheight -=20;
 
             contentStream.beginText();
-            contentStream.newLineAtOffset(width-150, currheight);
-            contentStream.setFont(PDType1Font.TIMES_BOLD,16);
-            contentStream.showText("Sub Total");
+            contentStream.newLineAtOffset(30, currheight);
+            contentStream.setFont(PDType1Font.TIMES_BOLD,15);
+            currheight -= 5;
+            contentStream.showText("MONTHLY CATEGORY QUANTITIES SOLD");
             contentStream.endText();
 
-            double grandtotal = 0;
-            double grandnettotal = 0;
+            widths = new ArrayList<>();
+            widths.add(0.85f);
+            widths.add(0.15f);
 
-            for (Category category:categoryDatabaseUtils.getAllCategory()
-                 ) {
-
-                if(checkpagecontent(currheight))
-                {
-                    contentStream.close();
-                    pdDocument.addPage(pdPage);
-                    pdPage = new PDPage(PDRectangle.A4);
-                    contentStream = new PDPageContentStream(pdDocument, pdPage);
-                    currheight = height-50;
-                }
-
-                double categorytotel =0;
-                contentStream.beginText();
-                currheight -=30;
-                contentStream.newLineAtOffset(50, currheight);
-                contentStream.setFont(PDType1Font.TIMES_ROMAN,16);
-                contentStream.showText(category.getName());
-                contentStream.endText();
-                for (Menu menu:menuDatabaseUtils.getMenuListByCategoryId(categoryDatabaseUtils.getCategoryByName(category.getName()).getId())
-                     ) {
-                    int quantity = 0;
-                    for (Order_Detail orderdetail:orderDetailDatabaseUtils.getOrderDetailByMenuId(menu.getId())
-                            ) {
-                        for (Order order:orderDatabaseUtils.getOrderListTodayHistory()
-                             ) {
-                            if(orderdetail.getOrder_id().compareTo(order.getId())==0){
-                                quantity +=orderdetail.getQty();
-                            }
-                        }
-                    }
-                    if(quantity>0) {
-                        if(checkpagecontent(currheight))
-                        {
-                            contentStream.close();
-                            pdDocument.addPage(pdPage);
-                            pdPage = new PDPage(PDRectangle.A4);
-                            contentStream = new PDPageContentStream(pdDocument, pdPage);
-                            currheight = height-50;
-                        }
-
-                        contentStream.beginText();
-                        currheight -= 20;
-                        contentStream.newLineAtOffset(80, currheight);
-                        contentStream.setFont(PDType1Font.TIMES_ROMAN, 14);
-                        contentStream.showText(menu.getName());
-                        contentStream.endText();
-
-                        contentStream.beginText();
-                        currheight -= 20;
-                        contentStream.newLineAtOffset(90, currheight);
-                        contentStream.setFont(PDType1Font.TIMES_ROMAN, 14);
-                        contentStream.showText(String.valueOf(quantity) + " x " + menu.getPrice());
-                        contentStream.endText();
-
-                        contentStream.beginText();
-                        contentStream.newLineAtOffset(width - 150, currheight);
-                        contentStream.setFont(PDType1Font.TIMES_ROMAN, 14);
-                        contentStream.showText(validatePriceFormat(quantity * menu.getPrice()));
-                        contentStream.endText();
-
-                        categorytotel += quantity * menu.getPrice();
-                    }
-
-                }
-
-                contentStream.beginText();
-                currheight -=20;
-                contentStream.newLineAtOffset(80, currheight);
-                contentStream.setFont(PDType1Font.TIMES_BOLD,13);
-                contentStream.showText("Total : ");
-                contentStream.endText();
-
-                contentStream.beginText();
-                contentStream.newLineAtOffset(width - 150, currheight);
-                contentStream.setFont(PDType1Font.TIMES_BOLD, 13);
-                contentStream.showText(validatePriceFormat(categorytotel));
-                contentStream.endText();
+            currheight = drawTable(currheight, 50, widths,
+                    orderDetailDatabaseUtils.monthlyOrderDetailRecapCategory(date));
 
 
-                contentStream.beginText();
-                currheight -=20;
-                contentStream.newLineAtOffset(80, currheight);
-                contentStream.setFont(PDType1Font.TIMES_BOLD,13);
-                contentStream.showText("PPN : ");
-                contentStream.endText();
-
-                contentStream.beginText();
-                contentStream.newLineAtOffset(width - 150, currheight);
-                contentStream.setFont(PDType1Font.TIMES_BOLD, 13);
-                contentStream.showText(validatePriceFormat(round(categorytotel/11)));
-                contentStream.endText();
-
-
-                contentStream.beginText();
-                currheight -=20;
-                contentStream.newLineAtOffset(80, currheight);
-                contentStream.setFont(PDType1Font.TIMES_BOLD,13);
-                contentStream.showText("Net Total : ");
-                contentStream.endText();
-
-                contentStream.beginText();
-                contentStream.newLineAtOffset(width - 150, currheight);
-                contentStream.setFont(PDType1Font.TIMES_BOLD, 13);
-                contentStream.showText(validatePriceFormat(round(categorytotel-(categorytotel/11))));
-                contentStream.endText();
-
-                grandtotal += categorytotel;
-                grandnettotal += categorytotel-(categorytotel/11);
-            }
+            currheight -=20;
+            contentStream.drawLine(30,currheight,width-30,currheight);
+            currheight -=20;
 
             contentStream.beginText();
-            currheight -= 40;
-            contentStream.newLineAtOffset(50, currheight);
-            contentStream.setFont(PDType1Font.TIMES_BOLD, 16);
-            contentStream.showText("Grand Total");
+            contentStream.newLineAtOffset(30, currheight);
+            contentStream.setFont(PDType1Font.TIMES_BOLD,15);
+            currheight -= 5;
+            contentStream.showText("DAILY AVERAGE TRAFFIC");
             contentStream.endText();
 
-            contentStream.beginText();
-            contentStream.newLineAtOffset(width - 150, currheight);
-            contentStream.setFont(PDType1Font.TIMES_BOLD, 16);
-            contentStream.showText(validatePriceFormat(round(grandtotal)));
-            contentStream.endText();
+            widths = new ArrayList<>();
+            widths.add(0.85f);
+            widths.add(0.15f);
 
-
-            contentStream.beginText();
-            currheight -= 40;
-            contentStream.newLineAtOffset(50, currheight);
-            contentStream.setFont(PDType1Font.TIMES_BOLD, 16);
-            contentStream.showText("Grand Net Total");
-            contentStream.endText();
-
-            contentStream.beginText();
-            contentStream.newLineAtOffset(width - 150, currheight);
-            contentStream.setFont(PDType1Font.TIMES_BOLD, 16);
-            contentStream.showText(validatePriceFormat(round(grandtotal)));
-            contentStream.endText();
+            currheight = drawTable(currheight, 50, widths,
+                    orderDetailDatabaseUtils.monthlyAverageDailyTraffic(date));
 
             contentStream.close();
             pdDocument.addPage(pdPage);
@@ -245,19 +142,34 @@ public class pdf_generator {
 //            pdDocument.save("F:\\"+ sdf.format(currdate) +".pdf");
 //            pdDocument.save("G:\\"+ sdf.format(currdate) +".pdf");
             pdDocument.close();
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
     }
 
-    boolean checkpagecontent(float height)
+    public pdf_generator() {
+
+    }
+
+    private float checkForNewPage(float height)
     {
         if(height<30)
         {
-            return true;
+            try {
+                contentStream.close();
+
+                pdDocument.addPage(pdPage);
+                pdPage = new PDPage(PDRectangle.A4);
+                contentStream = new PDPageContentStream(pdDocument, pdPage);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return pdPage.getMediaBox().getHeight()-30;
         }
         else {
-            return false;
+            return height;
         }
     }
 
@@ -275,114 +187,49 @@ public class pdf_generator {
 
     }
 
-    public void drawTable(PDPage page, PDPageContentStream contentStream,
-                                 float y, float margin,
-                                 String[][] content) throws IOException {
-        int rows = 40;
-        int cols = 3;
-        final float rowHeight = 20f;
-        final float tableWidth = page.getMediaBox().getWidth()-(2*margin);
-        final float tableHeight = rowHeight * rows;
-        final float colWidth = tableWidth/(float)cols;
-        final float cellMargin=5f;
+    public float drawTable(float y, float x,
+                           ArrayList<Float> widths, 
+                           ArrayList<Map<String, String>> data) throws IOException {
+        float cellMargin=5f;
+        float rowHeight = 20f;
+        float tableWidth = pdPage.getMediaBox().getWidth()-(2*x);
 
-        //draw the rows
-        float nexty = y ;
-        for (int i = 0; i <= rows; i++) {
-            contentStream.drawLine(margin,nexty,margin+tableWidth,nexty);
-            nexty-= rowHeight;
+        ArrayList<Float> cellWidth = new ArrayList<>();
+        for (Float f : widths) {
+            cellWidth.add(tableWidth * f);
         }
 
-        //draw the columns
-        float nextx = margin;
-        for (int i = 0; i <= cols; i++) {
-            contentStream.drawLine(nextx,y,nextx,y-tableHeight);
-            nextx += colWidth;
+        for (Map<String,String> map : data) {
+
+            y = checkForNewPage(y);
+
+            contentStream.drawLine(x, y, x + tableWidth, y);
+
+            float nextx = x;
+            int index = 0;
+            for (String str : map.keySet()) {
+                contentStream.drawLine(x, y, x, y - rowHeight);
+                String text = map.get(str);
+                if (map.get(str)==null) {
+                    text = "Null";
+                }
+
+                contentStream.beginText();
+                contentStream.moveTextPositionByAmount(nextx + cellMargin, y - 15);
+                contentStream.setFont(PDType1Font.TIMES_ROMAN,12);
+                contentStream.drawString(text);
+                contentStream.endText();
+
+                nextx += cellWidth.get(index);
+                index++;
+                contentStream.drawLine(nextx, y, nextx, y - rowHeight);
+            }
+            
+            y -= rowHeight;
+            contentStream.drawLine(x, y, x + tableWidth, y);
+            
         }
 
-        //now add the text
-        contentStream.setFont(PDType1Font.HELVETICA_BOLD,12);
-
-        float textx = margin+cellMargin;
-        float texty = y-15;
-
-        String head = "Ctegory";
-        contentStream.beginText();
-        contentStream.moveTextPositionByAmount(textx,texty);
-        contentStream.drawString(head);
-        contentStream.endText();
-        textx += colWidth;
-
-        head = "Menu";
-        contentStream.beginText();
-        contentStream.moveTextPositionByAmount(textx,texty);
-        contentStream.drawString(head);
-        contentStream.endText();
-        textx += colWidth;
-
-        head = "Quantity";
-        contentStream.beginText();
-        contentStream.moveTextPositionByAmount(textx,texty);
-        contentStream.drawString(head);
-        contentStream.endText();
-
-        texty-=rowHeight;
-        textx = margin+cellMargin;
-        rows++;
-
-//        float textx = margin+cellMargin;
-//        float texty = y-15;
-//        for(int i = 0; i < content.length; i++){
-//            for(int j = 0 ; j < content[i].length; j++){
-//                String text = content[i][j];
-//                contentStream.beginText();
-//                contentStream.moveTextPositionByAmount(textx,texty);
-//                contentStream.drawString(text);
-//                contentStream.endText();
-//                textx += colWidth;
-//            }
-//            texty-=rowHeight;
-//            textx = margin+cellMargin;
-//        }
-
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-        String dateInString = "07-07-2019";
-        Date date = new Date();
-        try {
-            date = formatter.parse(dateInString);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        for (Map<String,String> map: orderDetailDatabaseUtils.monthlyOrderDetailRecapMenu(date)) {
-            rows++;
-            cols = map.size();
-
-            String text = map.get("category_name");
-            contentStream.beginText();
-            contentStream.moveTextPositionByAmount(textx,texty);
-            contentStream.drawString(text);
-            contentStream.endText();
-            textx += colWidth;
-            System.out.println(text);
-
-            text = map.get("menu_name");
-            contentStream.beginText();
-            contentStream.moveTextPositionByAmount(textx,texty);
-            contentStream.drawString(text);
-            contentStream.endText();
-            textx += colWidth;
-            System.out.println(text);
-
-            text = map.get("qty");
-            contentStream.beginText();
-            contentStream.moveTextPositionByAmount(textx,texty);
-            contentStream.drawString(text);
-            contentStream.endText();
-            System.out.println(text);
-
-            texty-=rowHeight;
-            textx = margin+cellMargin;
-        }
+        return y - 5;
     }
 }

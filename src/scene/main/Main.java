@@ -20,6 +20,7 @@ import utils.SettingsUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by Elbert Utama on 20/04/2017.
@@ -42,7 +43,8 @@ public class Main extends Application {
 //        PrintDailyReport printDailyReport = new PrintDailyReport();
 //        printDailyReport.doPrintDaily();
 
-        pdf_generator pdf_generator = new pdf_generator();
+//        pdf_generator pdf_generator = new pdf_generator();
+//        pdf_generator.generateReport(new Date());
 
         Parent root = FXMLLoader.load(getClass().getResource("main.fxml"));
         primaryStage.setTitle("test");

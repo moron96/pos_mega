@@ -105,7 +105,7 @@ public class history_controller implements Initializable {
         if(listModelTable != null) {
 
             printBon = new PrintBon();
-            printBon.setData(listModelTable, total, discount, grand_total,order.getCustomer_code());
+            printBon.setData(listModelTable, total, discount, grand_total,order.getCustomer_code(),order);
             printBon.doprintbon();
 
         }

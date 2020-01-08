@@ -12,14 +12,18 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Paint;
+import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Callback;
+import javafx.util.Duration;
 import model.*;
 import model.Menu;
+import org.controlsfx.control.Notifications;
 import print.pdf.PrinterTest;
 import print.pdf.pdf_generator;
 import print.print.PrintDailyReport;
@@ -29,7 +33,13 @@ import utils.SettingsUtils;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,7 +62,8 @@ public class setting_controller implements Initializable {
     private ObservableList<Payment_Method> paymentlist;
 
     //--------------------------------------------------------------------------------------------- Settings
-
+    @FXML
+    GridPane main_grid_pane;
     @FXML
     Button setting_button_close;
 
@@ -72,17 +83,27 @@ public class setting_controller implements Initializable {
     Button setting_history_button_printrecap;
     @FXML
     Button setting_history_button_printsettings;
+    @FXML
+    DatePicker setting_history_datepicker;
 
     @FXML
-    void history_deleteall_button(){
+    void history_monthly_report_button(){
+        LocalDate localDate = setting_history_datepicker.getValue();
+        Instant instant = Instant.from(localDate.atStartOfDay(ZoneId.systemDefault()));
+        Date date = Date.from(instant);
+        SimpleDateFormat month = new SimpleDateFormat("MMMM", Locale.UK);
+        SimpleDateFormat year = new SimpleDateFormat("yyyy", Locale.UK);
+
 
         Stage stage = new Stage();
         Pane pane = new Pane();
 
         pane.setPrefSize(300, 200);
 
-        Label labelText = new Label("Are you sure want to delete?");
+        Label labelText = new Label("Are you sure want to create report for "+month.format(date)+" "+year.format(date)+"?");
         labelText.setPrefWidth(200);
+        labelText.setWrapText(true);
+        labelText.setMaxWidth(200);
         labelText.setAlignment(Pos.CENTER);
         labelText.setLayoutX(50);
         labelText.setLayoutY(70);
@@ -96,10 +117,12 @@ public class setting_controller implements Initializable {
             @Override
             public void handle(ActionEvent event) {
 
-                orderDatabaseUtils.truncateorder();
-                orderDetailDatabaseUtils.truncateOrderDetail();
-
-                set_setting_history_listview();
+                pdf_generator pdf_generator = new pdf_generator();
+                if (pdf_generator.generateReport(date)) {
+                    notification("Create pdf success", "PDF has been saved", main_grid_pane);
+                } else {
+                    notification("Failed creating pdf", "Failed to create ODF", main_grid_pane);
+                }
 
                 stage.close();
             }
@@ -129,22 +152,29 @@ public class setting_controller implements Initializable {
 
     @FXML
     void history_printrecap_button(){
-        pdf_generator pdf_generator = new pdf_generator();
-        //PrinterTest printerTest = new PrinterTest();
-        //printerTest.doPrintDaily();
         PrintDailyReport printDailyReport = new PrintDailyReport();
         printDailyReport.doPrintDaily();
     }
 
     @FXML
     void history_printsettings_button(){
-
         PrintDailyReport printDailyReport = new PrintDailyReport();
         printDailyReport.displayDialog();
     }
 
     void set_setting_history_listview(){
-        setting_history_listview.setItems(FXCollections.observableArrayList(orderDatabaseUtils.getOrderListTodayHistory()));
+        setting_history_datepicker.setValue(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+
+        populate_setting_history_listview();
+    }
+
+    @FXML
+    void populate_setting_history_listview() {
+        LocalDate localDate = setting_history_datepicker.getValue();
+        Instant instant = Instant.from(localDate.atStartOfDay(ZoneId.systemDefault()));
+        Date date = Date.from(instant);
+
+        setting_history_listview.setItems(FXCollections.observableArrayList(orderDatabaseUtils.getOrderListHistoryByDate(date)));
 
         setting_history_listview.setCellFactory(new Callback<ListView<Order>, ListCell<Order>>() {
             @Override
@@ -155,7 +185,17 @@ public class setting_controller implements Initializable {
                     protected void updateItem(Order order, boolean bln){
                         super.updateItem(order, bln);
                         if(order != null){
-                            setText(String.format("%-100s", order.getId().intValue()));
+                            Payment_Method pm = paymentMethodDatabaseUtils.getPaymentMethodById(order.getPayment_method_id());
+                            String payment = "Null";
+                            if (pm != null) {
+                                payment = pm.getName();
+                            }
+                            setText(String.format("%-21s %10s - Rp %9.0f | %3d items",
+                                    order.getCustomer_code().substring(0,Math.min(20,order.getCustomer_code().length())).trim(),
+                                    payment.trim(),
+                                    orderDatabaseUtils.getOrderTotalByID(order.getId()),
+                                    orderDatabaseUtils.getOrderQuantityByID(order.getId())));
+                            setFont(Font.font("Monospace"));
                         }
                     }
                 };
@@ -164,6 +204,16 @@ public class setting_controller implements Initializable {
         });
     }
 
+    private void notification(String title, String text, GridPane grid) {
+        Notifications notification = Notifications.create()
+                .title(title)
+                .text(text)
+                .hideAfter(Duration.seconds(2.5))
+                .position(Pos.BASELINE_LEFT)
+                .owner(grid)
+                .position(Pos.BOTTOM_RIGHT);
+        notification.showConfirm();
+    }
 
     //--------------------------------------------------------------------------------------------- Category
     @FXML

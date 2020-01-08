@@ -138,6 +138,89 @@ public class OrderDatabaseUtils {
         }
     }
 
+    public ArrayList<Order> getOrderListHistoryByDate(Date selectedDate) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.UK);
+        String sql = "SELECT * FROM " + TABLE_ORDERS + " WHERE " + COLUMN_ORDERS_STATUS_ID + " = 2 AND " + COLUMN_ORDERS_DATE + " BETWEEN '"+ sdf.format(selectedDate) +"' AND DATE_ADD('"+ sdf.format(selectedDate) +"', INTERVAL 1 DAY) AND " + COLUMN_ORDERS_DELETED_AT + " IS NULL;";
+        ResultSet result;
+        System.out.println(sql);
+        ArrayList<Order> list = new ArrayList<>();
+        try {
+            databaseHelper.open();
+            result = databaseHelper.doQuery(sql);
+
+            //insert data to ArrayList
+            while(result.next()) {
+                int id = result.getInt(COLUMN_ORDERS_ID);
+                String customerCode = result.getString(COLUMN_ORDERS_CUSTOMER_CODE);
+                Date date = result.getTimestamp(COLUMN_ORDERS_DATE);
+                System.out.println(sdf.format(date));
+                int statusId = result.getInt(COLUMN_ORDERS_STATUS_ID);
+                int paymentMethodId = result.getInt(COLUMN_ORDERS_PAYMENT_METHOD_ID);
+                double promoAmount = result.getDouble(COLUMN_ORDERS_PROMO_AMOUNT);
+                Date deletedAt = result.getDate(COLUMN_ORDERS_DELETED_AT);
+                String notes = result.getString(COLUMN_ORDERS_NOTES);
+
+                list.add(new Order(id, customerCode, date, statusId, paymentMethodId, promoAmount, deletedAt, notes));
+            }
+
+            result.close();
+            databaseHelper.close();
+            return list;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Logger.getLogger("Log SQL").log(Level.SEVERE, "Get Order List By Date Query failed!", e);
+            return null;
+        }
+    }
+
+    public double getOrderTotalByID(int id) {
+        String sql = "SELECT sum(qty*price) as total , sum(qty) as qty FROM " + TABLE_ORDER_DETAILS + " WHERE " + COLUMN_ORDER_DETAILS_ORDER_ID + " = " + String.valueOf(id);
+        ResultSet result;
+        System.out.println(sql);
+        double total = 0;
+        try {
+            databaseHelper.open();
+            result = databaseHelper.doQuery(sql);
+
+            //insert data to ArrayList
+            while(result.next()) {
+                total = result.getDouble("total");
+            }
+
+            result.close();
+            databaseHelper.close();
+            return total;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Logger.getLogger("Log SQL").log(Level.SEVERE, "Get Order Total By ID Query failed!", e);
+            return 0;
+        }
+    }
+
+    public int getOrderQuantityByID(int id) {
+        String sql = "SELECT sum(qty*price) as total , sum(qty) as qty FROM " + TABLE_ORDER_DETAILS + " WHERE " + COLUMN_ORDER_DETAILS_ORDER_ID + " = " + String.valueOf(id);
+        ResultSet result;
+        System.out.println(sql);
+        int qty = 0;
+        try {
+            databaseHelper.open();
+            result = databaseHelper.doQuery(sql);
+
+            //insert data to ArrayList
+            while(result.next()) {
+                qty = result.getInt("qty");
+            }
+
+            result.close();
+            databaseHelper.close();
+            return qty;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Logger.getLogger("Log SQL").log(Level.SEVERE, "Get Order Quantity By ID Query failed!", e);
+            return 0;
+        }
+    }
+
     public void insertNewOrder(String customerCode, Date date, int statusId, int paymentMethodId, double promoAmount, String notes) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.UK);
         String sql = "INSERT INTO " + TABLE_ORDERS + " ( " + COLUMN_ORDERS_CUSTOMER_CODE + ", " + COLUMN_ORDERS_DATE + ", " + COLUMN_ORDERS_STATUS_ID + ", " + COLUMN_ORDERS_PAYMENT_METHOD_ID + ", " + COLUMN_ORDERS_PROMO_AMOUNT + ", " + COLUMN_ORDERS_NOTES +

@@ -2,11 +2,10 @@ package print.print;
 
 import database.DBHelper;
 import database.DBHelperSingleton;
-import database.utils.CategoryDatabaseUtils;
-import database.utils.MenuDatabaseUtils;
-import database.utils.OrderDatabaseUtils;
-import database.utils.OrderDetailDatabaseUtils;
+import database.utils.*;
 import model.Model_Table;
+import model.Order;
+import model.Payment_Method;
 
 import javax.print.*;
 import javax.print.attribute.HashPrintRequestAttributeSet;
@@ -34,7 +33,10 @@ public class PrintBon implements Printable {
 
     private String customerid;
 
+    private Order order;
+
     private DBHelper dbHelper = DBHelperSingleton.getInstance();
+    private PaymentMethodDatabaseUtils paymentMethodDatabaseUtils = new PaymentMethodDatabaseUtils(dbHelper);
     private CategoryDatabaseUtils categoryDatabaseUtils = new CategoryDatabaseUtils(dbHelper);
     private OrderDatabaseUtils orderDatabaseUtils = new OrderDatabaseUtils(dbHelper);
     private OrderDetailDatabaseUtils orderDetailDatabaseUtils = new OrderDetailDatabaseUtils(dbHelper);
@@ -200,12 +202,13 @@ public class PrintBon implements Printable {
         return service;
     }
 
-    public void setData(ArrayList<Model_Table> listModelTable, double total, double discount, double grandtotal, String customerid) {
+    public void setData(ArrayList<Model_Table> listModelTable, double total, double discount, double grandtotal, String customerid, Order order) {
         this.listModelTable = listModelTable;
         this.total = total;
         this.discount = discount;
         this.grandtotal = grandtotal;
         this.customerid = customerid;
+        this.order = order;
     }
 
     public void doprintbon()
@@ -232,6 +235,7 @@ public class PrintBon implements Printable {
                     + "  alamat : Jl Danau Sunter Utara B1a no 10\n\n"
                     + "  " + sdf.format(currdate) + "\n\n"
                     + "  Customer : " + customerid + "\n\n"
+                    + "  Payment Method : " + paymentMethodDatabaseUtils.getPaymentMethodById(order.getPayment_method_id()).getName() + "\n\n"
                     + " ------------------------------------------\n\n";
 
 
@@ -253,6 +257,8 @@ public class PrintBon implements Printable {
             print += String .format("%-30s","  Grand Total");
             print += validatePriceFormat(grandtotal) + "\n";
             print += "\n\n\n\n\n";
+
+            System.out.println(print);
 
             printString(printerSetting.getPrinterName(), print);
             // cut that paper Baby!

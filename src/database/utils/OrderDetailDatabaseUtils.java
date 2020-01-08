@@ -250,19 +250,29 @@ public class OrderDetailDatabaseUtils {
                     " select m."+ COLUMN_MENUS_ID +" as menu_id, m."+ COLUMN_MENUS_NAME +" as menu_name, c."+ COLUMN_CATEGORIES_NAME +" as category_name from "+ TABLE_MENUS +" m" +
                     " left join "+ TABLE_CATEGORIES +" c on m."+ COLUMN_MENUS_CATEGORY_ID +" = c." + COLUMN_CATEGORIES_ID +
                 " ) m on m.menu_id = od." + COLUMN_ORDER_DETAILS_MENU_ID +
-                " where "+ COLUMN_ORDERS_DATE +" <= last_day('"+ sdf.format(date) +"') and "+ COLUMN_ORDERS_DATE +" >= date_add(date_add(LAST_DAY('"+ sdf.format(date) +"'),interval 1 DAY),interval -1 MONTH)" +
+                " where "+ COLUMN_ORDERS_DATE +" <= last_day('"+ sdf.format(date) +"')" +
+                " and "+ COLUMN_ORDERS_DATE +" >= date_add(date_add(LAST_DAY('"+ sdf.format(date) +"'),interval 1 DAY),interval -1 MONTH)" +
                 " group by menu_id" +
                 " order by "+ COLUMN_ORDER_DETAILS_QTY +" desc;";
 
         System.out.println(sql);
         ArrayList<Map<String, String>> maplist = new ArrayList<>();
+
+        Map<String, String> map = new HashMap<>();
+
+        map.put("category_name","CATEGORY");
+        map.put("menu_name","MENU");
+        map.put("qty","QUANTITY");
+
+        maplist.add(map);
+
         try {
             databaseHelper.open();
             result = databaseHelper.doQuery(sql);
 
             //insert data to ArrayList
             while(result.next()) {
-                Map<String, String> map = new HashMap<>();
+                map = new HashMap<>();
 
                 map.put("category_name",result.getString("category_name"));
                 map.put("menu_name",result.getString("menu_name"));
@@ -290,10 +300,11 @@ public class OrderDetailDatabaseUtils {
                 " left join (" +
                 " select m."+ COLUMN_MENUS_ID +" as menu_id, m."+ COLUMN_MENUS_NAME +" as menu_name, c."+ COLUMN_CATEGORIES_NAME +" as category_name from "+ TABLE_MENUS +" m" +
                 " left join "+ TABLE_CATEGORIES +" c on m."+ COLUMN_MENUS_CATEGORY_ID +" = c." + COLUMN_CATEGORIES_ID +
-                " ) m on m."+ COLUMN_MENUS_ID +" = od." + COLUMN_ORDER_DETAILS_MENU_ID +
-                " where "+ COLUMN_ORDERS_DATE +" <= last_day("+ sdf.format(date) +") and "+ COLUMN_ORDERS_DATE +" >= date_add(date_add(LAST_DAY("+ sdf.format(date) +"),interval 1 DAY),interval -1 MONTH)" +
+                " ) m on m.menu_id = od." + COLUMN_ORDER_DETAILS_MENU_ID +
+                " where "+ COLUMN_ORDERS_DATE +" <= last_day('"+ sdf.format(date) +"')" +
+                " and "+ COLUMN_ORDERS_DATE +" >= date_add(date_add(LAST_DAY('"+ sdf.format(date) +"'),interval 1 DAY),interval -1 MONTH)" +
                 " group by category_name" +
-                "order by "+ COLUMN_ORDER_DETAILS_QTY +" desc;";
+                " order by "+ COLUMN_ORDER_DETAILS_QTY +" desc;";
 
         System.out.println(sql);
         ArrayList<Map<String, String>> maplist = new ArrayList<>();
@@ -307,6 +318,53 @@ public class OrderDetailDatabaseUtils {
 
                 map.put("category_name",result.getString("category_name"));
                 map.put("qty",result.getString(COLUMN_ORDER_DETAILS_QTY));
+
+                maplist.add(map);
+            }
+
+            result.close();
+            databaseHelper.close();
+            return maplist;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Logger.getLogger("Log SQL").log(Level.SEVERE, "Get Monthly Order Detail Recap Query failed!", e);
+            return null;
+        }
+    }
+
+    public ArrayList<Map<String, String>> monthlyAverageDailyTraffic(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.UK);
+        ResultSet result;
+        String sql = "select dayname("+ COLUMN_ORDERS_DATE +") as day," +
+                " count(daily.dayofweek) as times," +
+                " sum(daily.qty) as total," +
+                " round(sum(daily.qty) / count(daily.dayofweek),2) as average" +
+                " from (" +
+                    " select "+ COLUMN_ORDERS_DATE +"," +
+                    " dayofmonth("+ COLUMN_ORDERS_DATE +") as dayofmonth," +
+                    " dayofweek("+ COLUMN_ORDERS_DATE +") as dayofweek," +
+                    " sum(od.qty) as qty" +
+                    " from "+ TABLE_ORDER_DETAILS +" od" +
+                    " left join "+ TABLE_ORDERS +" o on od."+ COLUMN_ORDER_DETAILS_ORDER_ID +" = o."+ COLUMN_ORDERS_ID +
+                    " where "+ COLUMN_ORDERS_DATE +" <= last_day('"+ sdf.format(date) +"')" +
+                    " and "+ COLUMN_ORDERS_DATE +" >= date_add(date_add(LAST_DAY('"+ sdf.format(date) +"'),interval 1 DAY),interval -1 MONTH)" +
+                    " group by dayofmonth(date)" +
+                " ) as daily" +
+                " group by dayofweek" +
+                " order by dayofweek asc;";
+
+        System.out.println(sql);
+        ArrayList<Map<String, String>> maplist = new ArrayList<>();
+        try {
+            databaseHelper.open();
+            result = databaseHelper.doQuery(sql);
+
+            //insert data to ArrayList
+            while(result.next()) {
+                Map<String, String> map = new HashMap<String, String>();
+
+                map.put("avg",result.getString("average"));
+                map.put("day",result.getString("day"));
 
                 maplist.add(map);
             }

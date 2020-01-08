@@ -13,5 +13,6 @@
     <orderEntry type="library" name="json-20160810-javadoc" level="project" />
     <orderEntry type="library" name="json-simple-1.1.1" level="project" />
     <orderEntry type="library" name="commons-logging-1.2-javadoc" level="project" />
+    <orderEntry type="library" name="controlsfx-8.40.14" level="project" />
   </component>
 </module>

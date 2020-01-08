@@ -242,7 +242,7 @@ public class bayar_controller implements Initializable{
 
 
             printBon = new PrintBon();
-            printBon.setData(listModelTable, total, discount, grand_total ,order.getCustomer_code());
+            printBon.setData(listModelTable, total, discount, grand_total ,order.getCustomer_code(),order);
             printBon.doprintbon();
 
         }
