@@ -125,6 +125,25 @@ public class pdf_generator {
             contentStream.newLineAtOffset(30, currheight);
             contentStream.setFont(PDType1Font.TIMES_BOLD,15);
             currheight -= 5;
+            contentStream.showText("MONTHLY PAYMENT METHOD QUANTITIES");
+            contentStream.endText();
+
+            widths = new ArrayList<>();
+            widths.add(0.85f);
+            widths.add(0.15f);
+
+            currheight = drawTable(currheight, 50, widths,
+                    orderDetailDatabaseUtils.monthlyOrderDetailRecapPeyment(date));
+
+
+            currheight -=20;
+            contentStream.drawLine(30,currheight,width-30,currheight);
+            currheight -=20;
+
+            contentStream.beginText();
+            contentStream.newLineAtOffset(30, currheight);
+            contentStream.setFont(PDType1Font.TIMES_BOLD,15);
+            currheight -= 5;
             contentStream.showText("DAILY AVERAGE TRAFFIC");
             contentStream.endText();
 
